@@ -11,7 +11,7 @@ class Settings extends StatefulWidget {
 
 List<String> methods = [
   "Shia Ithna-Ashari, Leva Institute, Qum",
-  'University of Islamic Sciences, Karachi"',
+  'University of Islamic Sciences, Karachi',
   'Islamic Society of North America (ISNA)',
   'Muslim World League',
   "Umm Al-Qura University, Makkah",

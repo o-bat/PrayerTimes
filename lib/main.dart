@@ -1,7 +1,7 @@
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
 import 'package:prayer_times/Components/provider.dart';
-import 'package:prayer_times/pages/namaz_vakitleri.dart';
+import 'package:prayer_times/pages/prayer_times.dart';
 import 'package:prayer_times/pages/settings.dart';
 import 'package:prayer_times/pages/tesbihat_menu.dart';
 import 'package:provider/provider.dart';
@@ -24,7 +24,8 @@ class _MyAppState extends State<MyApp> {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(
-          create: (context) => CMethodProvider(selected: "Diyanet İşleri Başkanliği, Turkey (experimental)"),
+          create: (context) => CMethodProvider(
+              selected: "Diyanet İşleri Başkanliği, Turkey (experimental)"),
         )
       ],
       child: Consumer<CMethodProvider>(
@@ -67,7 +68,7 @@ class _MyAppState extends State<MyApp> {
                     body: currentPage == 0
                         ? const Tesbihhat()
                         : currentPage == 1
-                            ? const NamazVakitleri()
+                            ? const PrayerTimes()
                             : const Settings()),
               );
             },
