@@ -43,6 +43,8 @@ dependencies:
 
   webview_flutter: ^4.2.4
   flutter_text_viewer: ^0.0.6
+  shared_preferences: ^2.2.3
+  provider: ^6.1.2
 
 dev_dependencies:
   flutter_test:

@@ -3,7 +3,7 @@ import 'dart:developer';
 import 'package:http/http.dart' as http;
 
 import 'package:geolocator/geolocator.dart';
-import 'package:prayer_times/models/model_calendar.dart';
+import 'package:prayer_times/models/model_calendar_offline.dart';
 
 Future<Calendar> getCalendar() async {
   // Check if location service is enabled
