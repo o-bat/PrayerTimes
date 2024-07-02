@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:prayer_times/Components/provider.dart';
+
 import 'package:provider/provider.dart';
 
 class Settings extends StatefulWidget {
@@ -23,7 +24,7 @@ List<String> methods = [
   "Qatar",
   "Majlis Ugama Islam Singapura, Singapore",
   "Union Organization Islamic de France",
-  "Diyanet İşleri Başkanliği, Turkey (experimental)",
+  "Diyanet İşleri Başkanliği, Turkey",
   "Spiritual Administration of Muslims of Russia",
   "Moonsighting Committee Worldwide ",
   "Dubai (experimental)",
@@ -51,30 +52,31 @@ class _SettingsState extends State<Settings> {
           Card(
               child: SizedBox(
             child: SizedBox(
+                width: MediaQuery.of(context).size.width,
                 child: DropdownButtonHideUnderline(
-              child: DropdownButton<String>(
-                borderRadius: const BorderRadius.all(Radius.circular(20)),
-                onChanged: (value) {
-                  setState(() {
-                    context
-                        .read<CMethodProvider>()
-                        .changeCMethod(newCMethod: value!, list: methods);
-                  });
-                },
-                items: methods
-                    .map(
-                      (method) => DropdownMenuItem<String>(
-                        value: method,
-                        child: Text(
-                          method,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    )
-                    .toList(),
-                value: methods[context.watch<CMethodProvider>().number],
-              ),
-            )),
+                  child: DropdownButton<String>(
+                    borderRadius: const BorderRadius.all(Radius.circular(20)),
+                    onChanged: (value) {
+                      setState(() {
+                        context
+                            .read<CMethodProvider>()
+                            .changeCMethod(newCMethod: value!, list: methods);
+                      });
+                    },
+                    items: methods
+                        .map(
+                          (method) => DropdownMenuItem<String>(
+                            value: method,
+                            child: Text(
+                              method,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        )
+                        .toList(),
+                    value: methods[context.watch<CMethodProvider>().number],
+                  ),
+                )),
           )),
         ],
       ),

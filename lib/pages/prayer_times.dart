@@ -1,11 +1,14 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:prayer_times/Components/components.dart';
 import 'package:prayer_times/models/model_calendar_daily.dart';
+
 import 'package:prayer_times/services/http.dart';
 
 class PrayerTimes extends StatefulWidget {
-  const PrayerTimes({super.key});
+  AsyncSnapshot<CalendarDaily> snapshot;
+  PrayerTimes({super.key, required this.snapshot});
 
   @override
   State<PrayerTimes> createState() => _PrayerTimesState();
@@ -27,98 +30,159 @@ class _PrayerTimesState extends State<PrayerTimes> {
   Widget build(BuildContext context) {
     return Padding(
         padding: const EdgeInsets.all(8.0),
-        child: FutureBuilder(
-          future: getCalendarDaily(context),
-          builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              return StreamBuilder<String>(
-                stream: _clockStream(),
-                builder: (context, snapshot0) {
-                  if (snapshot0.connectionState == ConnectionState.waiting) {
-                    return const CircularProgressIndicator();
-                  } else {
-                    return Column(
-                      children: [
-                        Card(
+        child: StreamBuilder<String>(
+          stream: _clockStream(),
+          builder: (context, snapshot0) {
+            if (snapshot0.connectionState == ConnectionState.waiting) {
+              return const CircularProgressIndicator();
+            } else {
+              return Column(
+                children: [
+                  Card(
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                        children: [
+                          Row(
+                            children: [
+                              Column(
+                                children: [
+                                  Text(
+                                    "Current Time",
+                                    style:
+                                        Theme.of(context).textTheme.titleLarge,
+                                  ),
+                                  Text(
+                                    snapshot0.data ?? "",
+                                    style:
+                                        Theme.of(context).textTheme.titleMedium,
+                                  ),
+                                ],
+                              ),
+                              const Spacer(),
+                              Column(
+                                children: [
+                                  Text(
+                                    getTime(widget.snapshot, snapshot0),
+                                    style:
+                                        Theme.of(context).textTheme.titleLarge,
+                                  ),
+                                  Text(
+                                    getTimeLeft(widget.snapshot, snapshot0),
+                                    style:
+                                        Theme.of(context).textTheme.titleMedium,
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  Card(
+                    child: ListTile(
+                      title: const Text("Fajr"),
+                      trailing:
+                          Text(widget.snapshot.data?.data?.timings?.fajr ?? ""),
+                    ),
+                  ),
+                  Card(
+                    child: ListTile(
+                      title: const Text("Dhuhr"),
+                      trailing: Text(
+                          widget.snapshot.data?.data?.timings?.dhuhr ?? ""),
+                    ),
+                  ),
+                  Card(
+                    child: ListTile(
+                      title: const Text("Asr"),
+                      trailing:
+                          Text(widget.snapshot.data?.data?.timings?.asr ?? ""),
+                    ),
+                  ),
+                  Card(
+                    child: ListTile(
+                      title: const Text("Maghrib"),
+                      trailing: Text(
+                          widget.snapshot.data?.data?.timings?.maghrib ?? ""),
+                    ),
+                  ),
+                  Card(
+                    child: ListTile(
+                      title: const Text("Isha"),
+                      trailing:
+                          Text(widget.snapshot.data?.data?.timings?.isha ?? ""),
+                    ),
+                  ),
+                  Card(
+                    child: ListTile(
+                      title: const Text("Midnight"),
+                      trailing: Text(
+                          widget.snapshot.data?.data?.timings?.midnight ?? ""),
+                    ),
+                  ),
+                  Row(
+                    children: [
+                      SizedBox(
+                        width: MediaQuery.of(context).size.width / 2 - 8,
+                        child: Card(
                           child: Padding(
-                            padding: const EdgeInsets.all(8.0),
+                            padding: const EdgeInsets.all(20.0),
                             child: Column(
                               children: [
-                                Row(
+                                const Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    Text(
-                                      "Current Time",
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .titleLarge,
-                                    ),
-                                    const Spacer(),
-                                    Text(
-                                      "Time Left",
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .titleLarge,
-                                    ),
+                                    Icon(Icons.sunny),
+                                    Icon(Icons.arrow_upward)
                                   ],
                                 ),
                                 Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    Text(
-                                      snapshot0.data ?? "",
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .titleMedium,
-                                    )
+                                    const Text("Sunrise "),
+                                    Text(widget.snapshot.data?.data?.timings
+                                            ?.sunrise ??
+                                        ""),
                                   ],
-                                ),
+                                )
                               ],
                             ),
                           ),
                         ),
-                        Card(
-                          child: ListTile(
-                            title: const Text("Fajr"),
-                            trailing: Text(snapshot.data!.data.timings.fajr),
+                      ),
+                      SizedBox(
+                        width: MediaQuery.of(context).size.width / 2 - 8,
+                        child: Card(
+                          child: Padding(
+                            padding: const EdgeInsets.all(20.0),
+                            child: Column(
+                              children: [
+                                const Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(Icons.sunny),
+                                    Icon(Icons.arrow_downward)
+                                  ],
+                                ),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    const Text("Sunset "),
+                                    Text(widget.snapshot.data?.data?.timings
+                                            ?.sunset ??
+                                        ""),
+                                  ],
+                                )
+                              ],
+                            ),
                           ),
                         ),
-                        Card(
-                          child: ListTile(
-                            title: const Text("Sunrise"),
-                            trailing: Text(snapshot.data!.data.timings.sunrise),
-                          ),
-                        ),
-                        Card(
-                          child: ListTile(
-                            title: const Text("Dhuhr"),
-                            trailing: Text(snapshot.data!.data.timings.dhuhr),
-                          ),
-                        ),
-                        Card(
-                          child: ListTile(
-                            title: const Text("Sunset"),
-                            trailing: Text(snapshot.data!.data.timings.sunset),
-                          ),
-                        ),
-                        Card(
-                          child: ListTile(
-                            title: const Text("Maghrib"),
-                            trailing: Text(snapshot.data!.data.timings.maghrib),
-                          ),
-                        ),
-                        Card(
-                          child: ListTile(
-                            title: const Text("Isha"),
-                            trailing: Text(snapshot.data!.data.timings.isha),
-                          ),
-                        ),
-                      ],
-                    );
-                  }
-                },
-              );
-            } else {
-              return const Center(
-                child: CircularProgressIndicator(),
+                      ),
+                    ],
+                  ),
+                ],
               );
             }
           },

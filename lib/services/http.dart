@@ -37,17 +37,19 @@ Future<CalendarDaily> getCalendarDaily(BuildContext context) async {
   var lon = location.longitude;
   log(lat.toString());
   log(lon.toString());
+  log(Provider.of<CMethodProvider>(context, listen: false).number.toString());
 
   DateTime now = DateTime.now();
   int year = now.year;
   int month = now.month;
   int day = now.day;
 
+  log("http://api.aladhan.com/v1/timings/$day-$month-$year?latitude=$lat&longitude=$lon&method=${Provider.of<CMethodProvider>(context, listen: false).number}");
+
   var response = await http.get(Uri.parse(
       "http://api.aladhan.com/v1/timings/$day-$month-$year?latitude=$lat&longitude=$lon&method=${Provider.of<CMethodProvider>(context, listen: false).number}"));
   if (response.statusCode == 200) {
-    var jsonResponse = convert.jsonDecode(response.body);
-    log(response.body);
+    return calendarDailyFromJson(response.body);
   } else {
     log('Request failed with status: ${response.statusCode}.');
   }
