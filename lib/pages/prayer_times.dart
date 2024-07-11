@@ -4,8 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:prayer_times/Components/components.dart';
 import 'package:prayer_times/models/model_calendar_daily.dart';
 
-import 'package:prayer_times/services/http.dart';
-
 class PrayerTimes extends StatefulWidget {
   AsyncSnapshot<CalendarDaily> snapshot;
   PrayerTimes({super.key, required this.snapshot});
@@ -39,6 +37,7 @@ class _PrayerTimesState extends State<PrayerTimes> {
               return Column(
                 children: [
                   Card(
+                    elevation: 0,
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Column(
@@ -81,6 +80,7 @@ class _PrayerTimesState extends State<PrayerTimes> {
                     ),
                   ),
                   Card(
+                    elevation: 0,
                     child: ListTile(
                       title: const Text("Fajr"),
                       trailing:
@@ -88,6 +88,7 @@ class _PrayerTimesState extends State<PrayerTimes> {
                     ),
                   ),
                   Card(
+                    elevation: 0,
                     child: ListTile(
                       title: const Text("Dhuhr"),
                       trailing: Text(
@@ -95,6 +96,7 @@ class _PrayerTimesState extends State<PrayerTimes> {
                     ),
                   ),
                   Card(
+                    elevation: 0,
                     child: ListTile(
                       title: const Text("Asr"),
                       trailing:
@@ -102,6 +104,7 @@ class _PrayerTimesState extends State<PrayerTimes> {
                     ),
                   ),
                   Card(
+                    elevation: 0,
                     child: ListTile(
                       title: const Text("Maghrib"),
                       trailing: Text(
@@ -109,17 +112,11 @@ class _PrayerTimesState extends State<PrayerTimes> {
                     ),
                   ),
                   Card(
+                    elevation: 0,
                     child: ListTile(
                       title: const Text("Isha"),
                       trailing:
                           Text(widget.snapshot.data?.data?.timings?.isha ?? ""),
-                    ),
-                  ),
-                  Card(
-                    child: ListTile(
-                      title: const Text("Midnight"),
-                      trailing: Text(
-                          widget.snapshot.data?.data?.timings?.midnight ?? ""),
                     ),
                   ),
                   Row(
@@ -127,6 +124,7 @@ class _PrayerTimesState extends State<PrayerTimes> {
                       SizedBox(
                         width: MediaQuery.of(context).size.width / 2 - 8,
                         child: Card(
+                          elevation: 0,
                           child: Padding(
                             padding: const EdgeInsets.all(20.0),
                             child: Column(
@@ -155,6 +153,7 @@ class _PrayerTimesState extends State<PrayerTimes> {
                       SizedBox(
                         width: MediaQuery.of(context).size.width / 2 - 8,
                         child: Card(
+                          elevation: 0,
                           child: Padding(
                             padding: const EdgeInsets.all(20.0),
                             child: Column(
@@ -181,6 +180,14 @@ class _PrayerTimesState extends State<PrayerTimes> {
                         ),
                       ),
                     ],
+                  ),
+                  Card(
+                    elevation: 0,
+                    child: ListTile(
+                      title: const Text("Midnight"),
+                      trailing: Text(
+                          widget.snapshot.data?.data?.timings?.midnight ?? ""),
+                    ),
                   ),
                 ],
               );

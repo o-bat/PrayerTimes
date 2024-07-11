@@ -1,7 +1,20 @@
+import 'dart:async';
+import 'dart:developer';
+import 'dart:io';
+
+import 'package:alarm/alarm.dart';
+import 'package:alarm/model/alarm_settings.dart';
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
+
+import 'package:intl/intl.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:prayer_times/Components/alarm.dart';
+
 import 'package:prayer_times/Components/provider.dart';
 import 'package:prayer_times/main.dart';
+import 'package:prayer_times/models/model_calendar_daily.dart';
+
 import 'package:prayer_times/services/http.dart';
 import 'package:provider/provider.dart';
 
@@ -13,6 +26,8 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
+
+
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
@@ -20,6 +35,16 @@ class _SplashScreenState extends State<SplashScreen> {
         ChangeNotifierProvider(
           create: (context) =>
               CMethodProvider(selected: "Diyanet İşleri Başkanliği, Turkey"),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => AlarmSettingsProvider(
+            selected: "Notification Sound",
+            fajrAlarm: true,
+            dhuhrAlarm: true,
+            asrAlarm: true,
+            maghribAlarm: true,
+            ishaAlarm: true,
+          ),
         ),
       ],
       builder: (context, child) {
@@ -61,6 +86,13 @@ class _SplashScreenState extends State<SplashScreen> {
                     ),
                   );
                 } else {
+                  Alarm.stop(1);
+                  Alarm.stop(2);
+                  Alarm.stop(3);
+                  Alarm.stop(4);
+                  Alarm.stop(5);
+                  initAlarms(snapshot, context);
+
                   return MyApp(snapshot: snapshot);
                 }
               },
@@ -70,4 +102,89 @@ class _SplashScreenState extends State<SplashScreen> {
       },
     );
   }
+}
+
+Future<void> initAlarms(
+    AsyncSnapshot<CalendarDaily> snapshot, BuildContext context) async {
+  final status = await Permission.notification.status;
+  if (!status.isGranted) return;
+
+  final now = DateTime.now();
+  final alarmSettings =
+      Provider.of<AlarmSettingsProvider>(context, listen: false);
+  final timings = snapshot.data?.data?.timings;
+
+  if (timings == null) return;
+
+  final prayerTimes = [
+    ('Fajr', timings.fajr, alarmSettings.fajrAlarm),
+    ('Dhuhr', timings.dhuhr, alarmSettings.dhuhrAlarm),
+    ('Asr', timings.asr, alarmSettings.asrAlarm),
+    ('Maghrib', timings.maghrib, alarmSettings.maghribAlarm),
+    ('Isha', timings.isha, alarmSettings.ishaAlarm),
+  ];
+
+  for (var i = 0; i < prayerTimes.length; i++) {
+    final (name, time, isAlarmOn) = prayerTimes[i];
+    if (time == null || !isAlarmOn) continue;
+
+    final prayerTime = _parseDateTime(now, time);
+    if (now.isBefore(prayerTime) && status.isGranted) {
+      setAlarms(time, name, i + 1, context);
+      log("Alarm set for $name");
+    }
+  }
+}
+
+DateTime _parseDateTime(DateTime now, String time) {
+  return DateTime.parse(
+      "${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')} $time:00.000000");
+}
+
+Future<void> setAlarms(String timeString, String timeLabel, int id,
+    BuildContext context) async {
+  // Use DateFormat.Hm()for parsing time in "HH:mm" format
+  final timeFormat = DateFormat.Hm();
+
+  // Parse the time string, handling potential errors
+  DateTime? parsedTime;
+  try {
+    parsedTime = timeFormat.parse(timeString);
+  } catch (e) {
+    // Handle parsing errors, e.g., show an error message to the user
+    print('Error parsing time: $e');
+    return; // Exit the function if parsing fails
+  }
+
+  final now = DateTime.now();
+  final alarmDateTime = DateTime(
+    now.year,
+    now.month,
+    now.day,
+    parsedTime.hour,
+    parsedTime.minute,
+  );
+
+  // Access AlarmSettingsProvider outside the widget tree
+  final alarmSettingsProvider = Provider.of<AlarmSettingsProvider>(
+      context, listen: false);
+
+  final alarmSettings = AlarmSettings(
+    id: id,
+    dateTime: alarmDateTime,
+    assetAudioPath: alarmSettingsProvider.number == 0
+        ? 'assets/alarm.mp3'
+        : 'assets/adhan.mp3',
+    loopAudio: true,
+    vibrate: true,
+    fadeDuration: 1.0,
+    notificationTitle: timeLabel,
+    // Use a more descriptive variable name
+    notificationBody: 'It is time for $timeLabel',
+    enableNotificationOnKill: Platform.isIOS,
+  );
+
+
+  // Use await to handle the asynchronous operation
+  await Alarm.set(alarmSettings: alarmSettings);
 }

@@ -1,10 +1,8 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
+
 import 'package:intl/intl.dart';
 import 'package:prayer_times/Components/tesbihatlar.dart';
 import 'package:prayer_times/models/model_calendar_daily.dart';
-import 'package:prayer_times/models/model_calendar_offline.dart';
 
 Widget buildMenuItem(
     {required String titel,
@@ -94,15 +92,13 @@ String getTimeLeft(
         .toString()
         .substring(0, 7);
   }
-  return format
-      .parse("${snapshot.data!.data?.timings?.midnight}:00")
-      .difference(format.parse(snapshot0.data ?? ""))
-      .toString()
-      .substring(0, 7);
+  return "";
 }
 
 String getTime(
-    AsyncSnapshot<CalendarDaily> snapshot, AsyncSnapshot<String> snapshot0) {
+  AsyncSnapshot<CalendarDaily> snapshot,
+  AsyncSnapshot<String> snapshot0,
+) {
   final format = DateFormat('hh:mm:ss');
 
   if (format
@@ -140,5 +136,5 @@ String getTime(
       .isAfter(format.parse(snapshot0.data ?? ""))) {
     return "Time Left to Isha";
   }
-  return "Time Left to Midnight";
+  return "See you Tomorrow :)";
 }

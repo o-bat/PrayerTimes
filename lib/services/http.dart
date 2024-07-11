@@ -1,86 +1,78 @@
-import 'dart:convert' as convert;
-import 'dart:developer';
-
+import 'package:auto_start_flutter/auto_start_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-
 import 'package:geolocator/geolocator.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:prayer_times/Components/provider.dart';
 import 'package:prayer_times/models/model_calendar_daily.dart';
-
 import 'package:provider/provider.dart';
+import 'package:synchronized/synchronized.dart';
 
 Future<CalendarDaily> getCalendarDaily(BuildContext context) async {
-  // Check if location service is enabled
-  var serviceEnabled = await Geolocator.isLocationServiceEnabled();
-  if (!serviceEnabled) {
-    return Future.error('Location services are disabled.');
-  }
-
-  // Check location permissions
-  var permission = await Geolocator.checkPermission();
-  if (permission == LocationPermission.denied) {
-    permission = await Geolocator.requestPermission();
-    if (permission == LocationPermission.denied) {
-      return Future.error('Location permissions are denied');
-    }
-  } else if (permission == LocationPermission.deniedForever) {
-    return Future.error(
-        'Location permissions are permanently denied, we cannot request permissions.');
-  }
+  // Check and request location permissions
+  await _checkAndRequestLocationPermission();
 
   // Get the user's location
-  var location = await Geolocator.getCurrentPosition(
+  Position position = await Geolocator.getCurrentPosition(
       desiredAccuracy: LocationAccuracy.high);
+  double lat = position.latitude;
+  double lon = position.longitude;
 
-  var lat = location.latitude;
-  var lon = location.longitude;
-  log(lat.toString());
-  log(lon.toString());
-  log(Provider.of<CMethodProvider>(context, listen: false).number.toString());
+  int methodNumber =
+      Provider.of<CMethodProvider>(context, listen: false).number;
 
   DateTime now = DateTime.now();
-  int year = now.year;
-  int month = now.month;
-  int day = now.day;
+  String url =
+      'http://api.aladhan.com/v1/timings/${now.day}-${now.month}-${now.year}?latitude=$lat&longitude=$lon&method=$methodNumber';
 
-  log("http://api.aladhan.com/v1/timings/$day-$month-$year?latitude=$lat&longitude=$lon&method=${Provider.of<CMethodProvider>(context, listen: false).number}");
-
-  var response = await http.get(Uri.parse(
-      "http://api.aladhan.com/v1/timings/$day-$month-$year?latitude=$lat&longitude=$lon&method=${Provider.of<CMethodProvider>(context, listen: false).number}"));
+  final response = await http.get(Uri.parse(url));
   if (response.statusCode == 200) {
     return calendarDailyFromJson(response.body);
   } else {
-    log('Request failed with status: ${response.statusCode}.');
+    throw Exception(
+        'Failed to load prayer times. Status: ${response.statusCode}');
   }
-  return calendarDailyFromJson(response.body);
 }
 
-Future<void> getLocation() async {
-  // Check if location service is enabled
-  var serviceEnabled = await Geolocator.isLocationServiceEnabled();
-  if (!serviceEnabled) {
-    return Future.error('Location services are disabled.');
-  }
+bool _isRequestingPermission = false;
+final _permissionLock = Lock();
 
-  // Check location permissions
-  var permission = await Geolocator.checkPermission();
-  if (permission == LocationPermission.denied) {
-    permission = await Geolocator.requestPermission();
-    if (permission == LocationPermission.denied) {
-      return Future.error('Location permissions are denied');
+Future<void> _checkAndRequestLocationPermission() async {
+  await _permissionLock.synchronized(() async {
+    if (_isRequestingPermission) {
+      // If a request is already in progress, wait for it to complete
+      return;
     }
-  } else if (permission == LocationPermission.deniedForever) {
-    return Future.error(
-        'Location permissions are permanently denied, we cannot request permissions.');
-  }
 
-  // Get the user's location
-  var location = await Geolocator.getCurrentPosition(
-      desiredAccuracy: LocationAccuracy.high);
+    getAutoStartPermission();
 
-  var lat = location.latitude;
-  var lon = location.longitude;
-  log(lat.toString());
-  log(lon.toString());
+    _isRequestingPermission = true;
+    try {
+      if (await Permission.scheduleExactAlarm.request().isDenied) {
+        openAppSettings();
+      }
+      if (await Permission.notification.request().isDenied) {
+        openAppSettings();
+      }
+      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        throw Exception('Location services are disabled.');
+      }
+
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) {
+          throw Exception('Location permissions are denied');
+        }
+      }
+
+      if (permission == LocationPermission.deniedForever) {
+        throw Exception(
+            'Location permissions are permanently denied, we cannot request permissions.');
+      }
+    } finally {
+      _isRequestingPermission = false;
+    }
+  });
 }
