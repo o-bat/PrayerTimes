@@ -48,9 +48,7 @@ Future<void> _checkAndRequestLocationPermission() async {
 
     _isRequestingPermission = true;
     try {
-      if (await Permission.scheduleExactAlarm.request().isDenied) {
-        openAppSettings();
-      }
+      
       if (await Permission.notification.request().isDenied) {
         openAppSettings();
       }

@@ -4,21 +4,25 @@ import 'package:alarm/alarm.dart';
 import 'package:alarm/model/alarm_settings.dart';
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:prayer_times/Components/alarm.dart';
-
+import 'package:prayer_times/Components/components.dart';
+import 'package:prayer_times/Components/provider.dart';
 
 import 'package:prayer_times/models/model_calendar_daily.dart';
 import 'package:prayer_times/pages/prayer_times.dart';
+import 'package:prayer_times/pages/search_page.dart';
 import 'package:prayer_times/pages/settings.dart';
 import 'package:prayer_times/pages/splash_screen.dart';
 import 'package:prayer_times/pages/statistics.dart';
 import 'package:prayer_times/pages/tesbihat_menu.dart';
+import 'package:provider/provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await Alarm.init();
-  runApp( SplashScreen());
+  runApp(const SplashScreen());
 }
 
 class MyApp extends StatefulWidget {
@@ -73,8 +77,8 @@ class _NaviagteState extends State<Naviagte> {
     Navigator.push(
       context,
       MaterialPageRoute(
-          builder: (context) =>  AlarmPage(
-              settings: alarmSettings,
+          builder: (context) => AlarmPage(
+                settings: alarmSettings,
               )),
     );
 
@@ -82,7 +86,7 @@ class _NaviagteState extends State<Naviagte> {
   }
 
   void loadAlarms() {
-    if(mounted){
+    if (mounted) {
       setState(() {
         alarms = Alarm.getAlarms();
         alarms.sort((a, b) => a.dateTime.isBefore(b.dateTime) ? 0 : 1);
@@ -90,10 +94,97 @@ class _NaviagteState extends State<Naviagte> {
     }
   }
 
-  int currentPage = 3;
+  int currentPage = 1;
   @override
   Widget build(BuildContext context) {
+    DateTime date = DateTime.now();
+    String day = DateFormat('EEEE').format(date).toString();
+
     return Scaffold(
+        floatingActionButton: currentPage == 2
+            ? FloatingActionButton(
+                onPressed: () {
+                  int rakat = day == "Monday"
+                      ? Provider.of<StatisticsProvider>(context, listen: false)
+                          .monday
+                      : day == "Tuesday"
+                          ? Provider.of<StatisticsProvider>(context,
+                                  listen: false)
+                              .tuesday
+                          : day == "Wednesday"
+                              ? Provider.of<StatisticsProvider>(context,
+                                      listen: false)
+                                  .wednesday
+                              : day == "Thursday"
+                                  ? Provider.of<StatisticsProvider>(context,
+                                          listen: false)
+                                      .thursday
+                                  : day == "Friday"
+                                      ? Provider.of<StatisticsProvider>(context,
+                                              listen: false)
+                                          .friday
+                                      : day == "Saturday"
+                                          ? Provider.of<StatisticsProvider>(
+                                                  context,
+                                                  listen: false)
+                                              .saturday
+                                          : Provider.of<StatisticsProvider>(
+                                                  context,
+                                                  listen: false)
+                                              .sunday;
+                  showModalBottomSheet(
+                    context: context,
+                    builder: (context) {
+                      return SizedBox(
+                        width: MediaQuery.of(context).size.width,
+                        height: MediaQuery.of(context).size.height / 3,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Text("Add Rakat"),
+                            Center(
+                              child: Transform.scale(
+                                scale: 2,
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    IconButton(
+                                        onPressed: () {
+                                          setState(() {
+                                            rakat--;
+
+                                            Provider.of<StatisticsProvider>(
+                                                    context,
+                                                    listen: false)
+                                                .changeValue(rakat);
+                                          });
+                                        },
+                                        icon: const Icon(Icons.remove)),
+                                    Text(rakat.toString()),
+                                    IconButton(
+                                        onPressed: () {
+                                          setState(() {
+                                            rakat++;
+                                            Provider.of<StatisticsProvider>(
+                                                    context,
+                                                    listen: false)
+                                                .changeValue(rakat);
+                                          });
+                                        },
+                                        icon: const Icon(Icons.add)),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  );
+                },
+                child: const Icon(Icons.add),
+              )
+            : null,
         bottomNavigationBar: NavigationBar(
           destinations: const [
             NavigationDestination(
@@ -103,11 +194,7 @@ class _NaviagteState extends State<Naviagte> {
             NavigationDestination(
                 icon: Icon(Icons.timelapse_outlined),
                 selectedIcon: Icon(Icons.timelapse_rounded),
-                label: "Namaz vakitleri"),
-            NavigationDestination(
-                icon: Icon(Icons.insert_chart_outlined_sharp),
-                selectedIcon: Icon(Icons.insert_chart),
-                label: "Statistics"),
+                label: "Prayer Times"),
             NavigationDestination(
                 icon: Icon(Icons.settings_outlined),
                 selectedIcon: Icon(Icons.settings),
@@ -122,7 +209,15 @@ class _NaviagteState extends State<Naviagte> {
         ),
         appBar: AppBar(
           actions: [
-            IconButton(onPressed: () async {}, icon: const Icon(Icons.search))
+            IconButton(
+                onPressed: () async {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const SearchPage(),
+                      ));
+                },
+                icon: const Hero(tag: "0", child: Icon(Icons.search)))
           ],
           title: const Text("Prayer Times"),
         ),
@@ -132,10 +227,8 @@ class _NaviagteState extends State<Naviagte> {
                 ? PrayerTimes(
                     snapshot: widget.snapshot,
                   )
-                : currentPage == 2
-                    ? const Statistics()
-                    : Settings(
-                        snapshot: widget.snapshot,
-                      ));
+                : Settings(
+                    snapshot: widget.snapshot,
+                  ));
   }
 }

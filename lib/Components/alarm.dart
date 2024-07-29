@@ -1,7 +1,12 @@
+import 'dart:io';
+
 import 'package:alarm/alarm.dart';
 import 'package:alarm/model/alarm_settings.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:prayer_times/Components/provider.dart';
 import 'package:prayer_times/pages/splash_screen.dart';
+import 'package:provider/provider.dart';
 import 'package:slidable_button/slidable_button.dart';
 
 class AlarmPage extends StatefulWidget {
@@ -19,7 +24,7 @@ class _AlarmPageState extends State<AlarmPage> {
     return Scaffold(
       body: Column(
         children: [
-          Spacer(),
+          const Spacer(),
           Transform.scale(
             scale: 2,
             child: Text(
@@ -27,15 +32,15 @@ class _AlarmPageState extends State<AlarmPage> {
               style: Theme.of(context).textTheme.bodyLarge,
             ),
           ),
-          Spacer(),
-          Spacer(),
+          const Spacer(),
+          const Spacer(),
           Padding(
-            padding: EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(8.0),
             child: Row(
               children: [
-                Spacer(),
+                const Spacer(),
                 Padding(
-                  padding: EdgeInsets.all(18.0),
+                  padding: const EdgeInsets.all(18.0),
                   child: Transform.scale(
                     scale: 2,
                     child: SizedBox(
@@ -49,8 +54,8 @@ class _AlarmPageState extends State<AlarmPage> {
                             .withOpacity(0.5),
                         buttonColor: Theme.of(context).primaryColor,
                         dismissible: false,
-                        label: Center(child: Icon(Icons.alarm)),
-                        child: Padding(
+                        label: const Center(child: Icon(Icons.alarm)),
+                        child: const Padding(
                           padding: EdgeInsets.all(8.0),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -69,13 +74,14 @@ class _AlarmPageState extends State<AlarmPage> {
                               DateTime currentTime = DateTime.now();
 
                               // Add 10 minutes to the current time
-                              Duration add10Minutes = Duration(minutes: 10);
+                              Duration add10Minutes =
+                                  const Duration(minutes: 10);
                               DateTime newTime = currentTime.add(add10Minutes);
                               setAlarms(
                                   "${newTime.hour}:${newTime.minute}'",
                                   " ${widget.settings.notificationTitle}c",
                                   widget.settings.id + 5,
-                                  context);
+                                  context.watch<AlarmSettingsProvider>());
                               Alarm.stop(widget.settings.id);
                               Navigator.pop(context);
                             }
@@ -85,13 +91,55 @@ class _AlarmPageState extends State<AlarmPage> {
                     ),
                   ),
                 ),
-                Spacer(),
+                const Spacer(),
               ],
             ),
           ),
-          Spacer()
+          const Spacer()
         ],
       ),
     );
+  }
+
+  Future<void> setAlarms(String timeString, String timeLabel, int id,
+      AlarmSettingsProvider alarmSettingsProvider) async {
+    // Use DateFormat.Hm() for parsing time in "HH:mm" format
+    final timeFormat = DateFormat.Hm();
+
+    // Parse the time string, handling potential errors
+    DateTime? parsedTime;
+    try {
+      parsedTime = timeFormat.parse(timeString);
+    } catch (e) {
+      // Handle parsing errors, e.g., show an error message to the user
+      print('Error parsing time: $e');
+      return; // Exit the function if parsing fails
+    }
+
+    final now = DateTime.now();
+    final alarmDateTime = DateTime(
+      now.year,
+      now.month,
+      now.day,
+      parsedTime.hour,
+      parsedTime.minute,
+    );
+
+    final alarmSettings = AlarmSettings(
+      id: id,
+      dateTime: alarmDateTime,
+      assetAudioPath: alarmSettingsProvider.number == 0
+          ? 'assets/alarm.mp3'
+          : 'assets/adhan.mp3',
+      loopAudio: true,
+      vibrate: true,
+      fadeDuration: 1.0,
+      notificationTitle: timeLabel,
+      notificationBody: 'It is time for $timeLabel',
+      enableNotificationOnKill: Platform.isIOS,
+    );
+
+    // Use await to handle the asynchronous operation
+    await Alarm.set(alarmSettings: alarmSettings);
   }
 }
