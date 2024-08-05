@@ -4,19 +4,21 @@ import 'package:alarm/alarm.dart';
 import 'package:alarm/model/alarm_settings.dart';
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+
 import 'package:prayer_times/Components/alarm.dart';
-import 'package:prayer_times/Components/components.dart';
-import 'package:prayer_times/Components/provider.dart';
+
+
+
 
 import 'package:prayer_times/models/model_calendar_daily.dart';
 import 'package:prayer_times/pages/prayer_times.dart';
-import 'package:prayer_times/pages/search_page.dart';
+import 'package:prayer_times/pages/search_bar.dart';
+
 import 'package:prayer_times/pages/settings.dart';
 import 'package:prayer_times/pages/splash_screen.dart';
-import 'package:prayer_times/pages/statistics.dart';
+
 import 'package:prayer_times/pages/tesbihat_menu.dart';
-import 'package:provider/provider.dart';
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -97,94 +99,7 @@ class _NaviagteState extends State<Naviagte> {
   int currentPage = 1;
   @override
   Widget build(BuildContext context) {
-    DateTime date = DateTime.now();
-    String day = DateFormat('EEEE').format(date).toString();
-
     return Scaffold(
-        floatingActionButton: currentPage == 2
-            ? FloatingActionButton(
-                onPressed: () {
-                  int rakat = day == "Monday"
-                      ? Provider.of<StatisticsProvider>(context, listen: false)
-                          .monday
-                      : day == "Tuesday"
-                          ? Provider.of<StatisticsProvider>(context,
-                                  listen: false)
-                              .tuesday
-                          : day == "Wednesday"
-                              ? Provider.of<StatisticsProvider>(context,
-                                      listen: false)
-                                  .wednesday
-                              : day == "Thursday"
-                                  ? Provider.of<StatisticsProvider>(context,
-                                          listen: false)
-                                      .thursday
-                                  : day == "Friday"
-                                      ? Provider.of<StatisticsProvider>(context,
-                                              listen: false)
-                                          .friday
-                                      : day == "Saturday"
-                                          ? Provider.of<StatisticsProvider>(
-                                                  context,
-                                                  listen: false)
-                                              .saturday
-                                          : Provider.of<StatisticsProvider>(
-                                                  context,
-                                                  listen: false)
-                                              .sunday;
-                  showModalBottomSheet(
-                    context: context,
-                    builder: (context) {
-                      return SizedBox(
-                        width: MediaQuery.of(context).size.width,
-                        height: MediaQuery.of(context).size.height / 3,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Text("Add Rakat"),
-                            Center(
-                              child: Transform.scale(
-                                scale: 2,
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    IconButton(
-                                        onPressed: () {
-                                          setState(() {
-                                            rakat--;
-
-                                            Provider.of<StatisticsProvider>(
-                                                    context,
-                                                    listen: false)
-                                                .changeValue(rakat);
-                                          });
-                                        },
-                                        icon: const Icon(Icons.remove)),
-                                    Text(rakat.toString()),
-                                    IconButton(
-                                        onPressed: () {
-                                          setState(() {
-                                            rakat++;
-                                            Provider.of<StatisticsProvider>(
-                                                    context,
-                                                    listen: false)
-                                                .changeValue(rakat);
-                                          });
-                                        },
-                                        icon: const Icon(Icons.add)),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                  );
-                },
-                child: const Icon(Icons.add),
-              )
-            : null,
         bottomNavigationBar: NavigationBar(
           destinations: const [
             NavigationDestination(
@@ -210,14 +125,15 @@ class _NaviagteState extends State<Naviagte> {
         appBar: AppBar(
           actions: [
             IconButton(
-                onPressed: () async {
+                onPressed: () {
                   Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const SearchPage(),
-                      ));
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const SearchBarPage(),
+                    ),
+                  );
                 },
-                icon: const Hero(tag: "0", child: Icon(Icons.search)))
+                icon: const Icon(Icons.search))
           ],
           title: const Text("Prayer Times"),
         ),
