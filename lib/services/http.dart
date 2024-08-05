@@ -4,40 +4,11 @@ import 'package:http/http.dart' as http;
 import 'package:geolocator/geolocator.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:prayer_times/Components/provider.dart';
-import 'package:prayer_times/api_key.dart';
+
 import 'package:prayer_times/models/adress.dart';
 import 'package:prayer_times/models/model_calendar_daily.dart';
 import 'package:provider/provider.dart';
 import 'package:synchronized/synchronized.dart';
-import 'dart:convert';
-import 'package:intl/intl.dart';
-
-Future<String> getTimeForLocation(double latitude, double longitude) async {
-  // Replace YOUR_API_KEY with your actual TimeZoneDB API key
-  String apiKey = api_key;
-  final url =
-      'http://api.timezonedb.com/v2.1/get-time-zone?key=$apiKey&format=json&by=position&lat=$latitude&lng=$longitude';
-
-  final response = await http.get(Uri.parse(url));
-
-  if (response.statusCode == 200) {
-    final data = json.decode(response.body);
-    final timestamp = data['timestamp'];
-    final zoneName = data['zoneName'];
-
-    // Create a DateTime object from the timestamp
-    final dateTime =
-        DateTime.fromMillisecondsSinceEpoch(timestamp * 1000, isUtc: true);
-
-    // Format the time
-    final formatter = DateFormat('HH:mm:ss');
-    final localTime = formatter.format(dateTime.toLocal());
-
-    return 'The current time at ($latitude, $longitude) is $localTime $zoneName';
-  } else {
-    throw Exception('Failed to load timezone data');
-  }
-}
 
 Future<CalendarDaily> getCalendarDaily(BuildContext context) async {
   // Check and request location permissions
@@ -117,13 +88,8 @@ Future<List<Adresses>> getSuggestion(String searchElement) async {
   }
 }
 
-
-
-
-Future<CalendarDaily> getCalendarDailyFromLatLon(double lat, double lon, BuildContext
-context) async {
-
-
+Future<CalendarDaily> getCalendarDailyFromLatLon(
+    double lat, double lon, BuildContext context) async {
   int methodNumber =
       Provider.of<CMethodProvider>(context, listen: false).number;
 
