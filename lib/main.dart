@@ -6,6 +6,7 @@ import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
 
 import 'package:prayer_times/Components/alarm.dart';
+import 'package:prayer_times/Components/provider.dart';
 
 import 'package:prayer_times/models/model_calendar_daily.dart';
 import 'package:prayer_times/pages/prayer_times.dart';
@@ -15,13 +16,25 @@ import 'package:prayer_times/pages/settings.dart';
 import 'package:prayer_times/pages/splash_screen.dart';
 
 import 'package:prayer_times/pages/tesbihat_menu.dart';
+import 'package:provider/provider.dart';
 import 'package:timezone/data/latest.dart' as tz;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   tz.initializeTimeZones();
   await Alarm.init();
-  runApp(const SplashScreen());
+  runApp(ChangeNotifierProvider(
+    create: (context) => SettingsProvider(
+        is12h: false,
+        selectedM: "Diyanet İşleri Başkanliği, Turkey",
+        fajrAlarm: true,
+        dhuhrAlarm: true,
+        asrAlarm: true,
+        maghribAlarm: true,
+        ishaAlarm: true,
+        selected: "Notification Sound"),
+    child: const SplashScreen(),
+  ));
 }
 
 class MyApp extends StatefulWidget {

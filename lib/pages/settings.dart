@@ -57,177 +57,204 @@ bool fajrAlarm = true;
 class _SettingsState extends State<Settings> {
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              "Calculation Method",
-              style: TextStyle(
-                  color: Theme.of(context).primaryColor, fontSize: 15),
-            ),
-            ListTile(
-              onTap: () {},
-              subtitle: DropdownButtonHideUnderline(
-                child: DropdownButton<String>(
-                  isExpanded: true,
-                  borderRadius: const BorderRadius.all(Radius.circular(20)),
-                  onChanged: (value) {
-                    setState(() {
-                      context
-                          .read<CMethodProvider>()
-                          .changeCMethod(newCMethod: value!, list: methods);
-                    });
-                  },
-                  items: methods
-                      .map(
-                        (method) => DropdownMenuItem<String>(
-                          value: method,
-                          child: Text(
-                            method,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      )
-                      .toList(),
-                  value: methods[context.watch<CMethodProvider>().number],
+    return Consumer(
+      builder: (context, value, child) {
+        return SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "Calculation Method",
+                  style: TextStyle(
+                      color: Theme.of(context).primaryColor, fontSize: 15),
                 ),
-              ),
-            ),
-            const Divider(),
-            Text(
-              "Alarms",
-              style: TextStyle(
-                  color: Theme.of(context).primaryColor, fontSize: 15),
-            ),
-            ListTile(
-                onTap: () {},
-                title: const Text("Fajr"),
-                subtitle: const Text("Set an Alarm for Fajr"),
-                trailing: Switch(
-                  value:
-                      Provider.of<AlarmSettingsProvider>(context, listen: true)
-                          .fajrAlarm,
-                  onChanged: (value) async {
-                    Provider.of<AlarmSettingsProvider>(context, listen: false)
-                        .changefajrAlarm(
-                      newValue: value,
-                      name: "fajrAlarm",
-                    );
-                    setState(() {});
-                    initAlarms(widget.snapshot);
-                  },
-                )),
-            ListTile(
-                onTap: () {},
-                title: const Text("Dhuhr"),
-                subtitle: const Text("Set an Alarm for Dhuhr"),
-                trailing: Switch(
-                  value:
-                      Provider.of<AlarmSettingsProvider>(context, listen: true)
-                          .dhuhrAlarm,
-                  onChanged: (value) async {
-                    Provider.of<AlarmSettingsProvider>(context, listen: false)
-                        .changeDhuhrAlarm(
-                      newValue: value,
-                      name: "dhuhrAlarm",
-                    );
-                    setState(() {});
-                    initAlarms(widget.snapshot);
-                  },
-                )),
-            ListTile(
-                onTap: () {},
-                title: const Text("Asr"),
-                subtitle: const Text("Set an Alarm for Asr"),
-                trailing: Switch(
-                  value:
-                      Provider.of<AlarmSettingsProvider>(context, listen: true)
-                          .asrAlarm,
-                  onChanged: (value) async {
-                    Provider.of<AlarmSettingsProvider>(context, listen: false)
-                        .changeAsrAlarm(
-                      newValue: value,
-                      name: "asrAlarm",
-                    );
-                    setState(() {});
-                    initAlarms(widget.snapshot);
-                  },
-                )),
-            ListTile(
-                onTap: () {},
-                title: const Text("Maghrib"),
-                subtitle: const Text("Set an Alarm for Maghrib"),
-                trailing: Switch(
-                  value:
-                      Provider.of<AlarmSettingsProvider>(context, listen: true)
-                          .maghribAlarm,
-                  onChanged: (value) async {
-                    Provider.of<AlarmSettingsProvider>(context, listen: false)
-                        .changeMaghribAlarm(
-                      newValue: value,
-                      name: "maghribAlarm",
-                    );
-                    setState(() {});
-                    initAlarms(widget.snapshot);
-                  },
-                )),
-            ListTile(
-              onTap: () {},
-              title: const Text("Isha"),
-              subtitle: const Text("Set an Alarm for Isha"),
-              trailing: Switch(
-                value: Provider.of<AlarmSettingsProvider>(context, listen: true)
-                    .ishaAlarm,
-                onChanged: (value) async {
-                  setState(() {
-                    Provider.of<AlarmSettingsProvider>(context, listen: false)
-                        .changeIshaAlarm(
-                      newValue: value,
-                      name: "ishaAlarm",
-                    );
-                  });
-                  initAlarms(widget.snapshot);
-                },
-              ),
-            ),
-            ListTile(
-              onTap: () {},
-              title: const Text("Alarm Sound"),
-              subtitle: DropdownButtonHideUnderline(
-                child: DropdownButton<String>(
-                  isExpanded: true,
-                  borderRadius: const BorderRadius.all(Radius.circular(20)),
-                  onChanged: (value) async {
-                    setState(() {
-                      context
-                          .read<AlarmSettingsProvider>()
-                          .changeSound(newCMethod: value!, list: sounds);
-
+                ListTile(
+                  onTap: () {},
+                  subtitle: DropdownButtonHideUnderline(
+                    child: DropdownButton<String>(
+                      isExpanded: true,
+                      borderRadius: const BorderRadius.all(Radius.circular(20)),
+                      onChanged: (value) {
+                        setState(() {
+                          context
+                              .read<SettingsProvider>()
+                              .changeCMethod(newCMethod: value!, list: methods);
+                        });
+                      },
+                      items: methods
+                          .map(
+                            (method) => DropdownMenuItem<String>(
+                              value: method,
+                              child: Text(
+                                method,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          )
+                          .toList(),
+                      value:
+                          methods[context.watch<SettingsProvider>().numberOfM],
+                    ),
+                  ),
+                ),
+                const Divider(),
+                Text(
+                  "Alarms",
+                  style: TextStyle(
+                      color: Theme.of(context).primaryColor, fontSize: 15),
+                ),
+                ListTile(
+                    onTap: () {},
+                    title: const Text("Fajr"),
+                    subtitle: const Text("Set an Alarm for Fajr"),
+                    trailing: Switch(
+                      value:
+                          Provider.of<SettingsProvider>(context, listen: true)
+                              .fajrAlarm,
+                      onChanged: (value) async {
+                        Provider.of<SettingsProvider>(context, listen: false)
+                            .changefajrAlarm(
+                          newValue: value,
+                          name: "fajrAlarm",
+                        );
+                        setState(() {});
+                        initAlarms(widget.snapshot);
+                      },
+                    )),
+                ListTile(
+                    onTap: () {},
+                    title: const Text("Dhuhr"),
+                    subtitle: const Text("Set an Alarm for Dhuhr"),
+                    trailing: Switch(
+                      value:
+                          Provider.of<SettingsProvider>(context, listen: true)
+                              .dhuhrAlarm,
+                      onChanged: (value) async {
+                        Provider.of<SettingsProvider>(context, listen: false)
+                            .changeDhuhrAlarm(
+                          newValue: value,
+                          name: "dhuhrAlarm",
+                        );
+                        setState(() {});
+                        initAlarms(widget.snapshot);
+                      },
+                    )),
+                ListTile(
+                    onTap: () {},
+                    title: const Text("Asr"),
+                    subtitle: const Text("Set an Alarm for Asr"),
+                    trailing: Switch(
+                      value:
+                          Provider.of<SettingsProvider>(context, listen: true)
+                              .asrAlarm,
+                      onChanged: (value) async {
+                        Provider.of<SettingsProvider>(context, listen: false)
+                            .changeAsrAlarm(
+                          newValue: value,
+                          name: "asrAlarm",
+                        );
+                        setState(() {});
+                        initAlarms(widget.snapshot);
+                      },
+                    )),
+                ListTile(
+                    onTap: () {},
+                    title: const Text("Maghrib"),
+                    subtitle: const Text("Set an Alarm for Maghrib"),
+                    trailing: Switch(
+                      value:
+                          Provider.of<SettingsProvider>(context, listen: true)
+                              .maghribAlarm,
+                      onChanged: (value) async {
+                        Provider.of<SettingsProvider>(context, listen: false)
+                            .changeMaghribAlarm(
+                          newValue: value,
+                          name: "maghribAlarm",
+                        );
+                        setState(() {});
+                        initAlarms(widget.snapshot);
+                      },
+                    )),
+                ListTile(
+                  onTap: () {},
+                  title: const Text("Isha"),
+                  subtitle: const Text("Set an Alarm for Isha"),
+                  trailing: Switch(
+                    value: Provider.of<SettingsProvider>(context, listen: true)
+                        .ishaAlarm,
+                    onChanged: (value) async {
+                      setState(() {
+                        Provider.of<SettingsProvider>(context, listen: false)
+                            .changeIshaAlarm(
+                          newValue: value,
+                          name: "ishaAlarm",
+                        );
+                      });
                       initAlarms(widget.snapshot);
-                    });
-                  },
-                  items: sounds
-                      .map(
-                        (method) => DropdownMenuItem<String>(
-                          value: method,
-                          child: Text(
-                            method,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      )
-                      .toList(),
-                  value: sounds[
-                      Provider.of<AlarmSettingsProvider>(context).number],
+                    },
+                  ),
                 ),
-              ),
+                ListTile(
+                  onTap: () {},
+                  title: const Text("Alarm Sound"),
+                  subtitle: DropdownButtonHideUnderline(
+                    child: DropdownButton<String>(
+                      isExpanded: true,
+                      borderRadius: const BorderRadius.all(Radius.circular(20)),
+                      onChanged: (value) async {
+                        setState(() {
+                          context
+                              .read<SettingsProvider>()
+                              .changeSound(newCMethod: value!, list: sounds);
+
+                          initAlarms(widget.snapshot);
+                        });
+                      },
+                      items: sounds
+                          .map(
+                            (method) => DropdownMenuItem<String>(
+                              value: method,
+                              child: Text(
+                                method,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          )
+                          .toList(),
+                      value:
+                          sounds[Provider.of<SettingsProvider>(context).number],
+                    ),
+                  ),
+                ),
+                const Divider(),
+                Text(
+                  "Hour",
+                  style: TextStyle(
+                      color: Theme.of(context).primaryColor, fontSize: 15),
+                ),
+                ListTile(
+                  onTap: () {},
+                  title: const Text("12 Hours"),
+                  subtitle: const Text("Use 12h Format"),
+                  trailing: Switch(
+                    value: Provider.of<SettingsProvider>(context, listen: true)
+                        .is12h,
+                    onChanged: (value) async {
+                      setState(() {
+                        Provider.of<SettingsProvider>(context, listen: false)
+                            .change24h(newData: value);
+                      });
+                    },
+                  ),
+                ),
+                const Divider()
+              ],
             ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 
@@ -241,7 +268,7 @@ class _SettingsState extends State<Settings> {
     }
 
     final now = DateTime.now();
-    final alarmSettings = context.read<AlarmSettingsProvider>();
+    final alarmSettings = context.read<SettingsProvider>();
     final timings = snapshot.data?.data?.timings;
 
     if (timings == null) return;
@@ -272,7 +299,7 @@ class _SettingsState extends State<Settings> {
   }
 
   Future<void> setAlarms(String timeString, String timeLabel, int id,
-      AlarmSettingsProvider alarmSettingsProvider) async {
+      SettingsProvider alarmSettingsProvider) async {
     // Use DateFormat.Hm() for parsing time in "HH:mm" format
     final timeFormat = DateFormat.Hm();
 

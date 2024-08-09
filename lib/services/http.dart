@@ -21,7 +21,7 @@ Future<CalendarDaily> getCalendarDaily(BuildContext context) async {
   double lon = position.longitude;
 
   int methodNumber =
-      Provider.of<CMethodProvider>(context, listen: false).number;
+      Provider.of<SettingsProvider>(context, listen: false).number;
 
   DateTime now = DateTime.now();
   String url =
@@ -91,7 +91,7 @@ Future<List<Adresses>> getSuggestion(String searchElement) async {
 Future<CalendarDaily> getCalendarDailyFromLatLon(
     double lat, double lon, BuildContext context) async {
   int methodNumber =
-      Provider.of<CMethodProvider>(context, listen: false).number;
+      Provider.of<SettingsProvider>(context, listen: false).number;
 
   DateTime now = DateTime.now();
   String url =

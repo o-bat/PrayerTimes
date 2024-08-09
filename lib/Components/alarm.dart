@@ -81,7 +81,7 @@ class _AlarmPageState extends State<AlarmPage> {
                                   "${newTime.hour}:${newTime.minute}'",
                                   " ${widget.settings.notificationTitle}c",
                                   widget.settings.id + 5,
-                                  context.watch<AlarmSettingsProvider>());
+                                  context.watch<SettingsProvider>());
                               Alarm.stop(widget.settings.id);
                               Navigator.pop(context);
                             }
@@ -102,7 +102,7 @@ class _AlarmPageState extends State<AlarmPage> {
   }
 
   Future<void> setAlarms(String timeString, String timeLabel, int id,
-      AlarmSettingsProvider alarmSettingsProvider) async {
+      SettingsProvider alarmSettingsProvider) async {
     // Use DateFormat.Hm() for parsing time in "HH:mm" format
     final timeFormat = DateFormat.Hm();
 
